@@ -3,7 +3,7 @@
 > A beautiful, high-fidelity clone of the Typeform application, replicating its core form-building, form-filling, and analytics workflows.
 
 <div align="center">
-  <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=2000" alt="Formly Dashboard" style="border-radius: 12px; margin: 20px 0;" />
+  <img src="./dashboard.png" alt="Formly Dashboard" style="border-radius: 12px; margin: 20px 0; border: 1px solid #eaeaea;" />
 </div>
 
 ## ✨ Features
