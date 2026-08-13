@@ -176,7 +176,14 @@ export default function Dashboard() {
         return result;
     }, [forms, statusTab, searchQuery, sortOption, responseCounts]);
 
-    const navItems = [
+    type NavItem = {
+        name?: string;
+        icon?: React.ElementType;
+        badge?: number | string;
+        isDivider?: boolean;
+    };
+
+    const navItems: NavItem[] = [
         { name: 'Home', icon: Home },
         { name: 'My Forms', icon: FileText },
         { name: 'Responses', icon: MessageSquare, badge: totalResponses }

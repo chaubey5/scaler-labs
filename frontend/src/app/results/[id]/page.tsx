@@ -3,11 +3,37 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { fetchForm, fetchResponses } from '@/lib/api';
 
+interface Answer {
+    id: string;
+    question_id: string;
+    value: string;
+}
+
+interface FormResponse {
+    id: string;
+    form_id: string;
+    submitted_at: string;
+    answers: Answer[];
+}
+
+interface Question {
+    id: string;
+    title: string;
+    type: string;
+}
+
+interface Form {
+    id: string;
+    title: string;
+    status: string;
+    questions: Question[];
+}
+
 export default function ResultsDashboard() {
     const params = useParams();
     const router = useRouter();
-    const [form, setForm] = useState<Record<string, unknown> | null>(null);
-    const [responses, setResponses] = useState<Record<string, unknown>[]>([]);
+    const [form, setForm] = useState<Form | null>(null);
+    const [responses, setResponses] = useState<FormResponse[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -59,9 +85,9 @@ export default function ResultsDashboard() {
                             <thead>
                                 <tr className="bg-gray-50 border-b border-gray-200">
                                     <th className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Submitted At</th>
-                                    {questions.map((q: Record<string, unknown>) => (
-                                        <th key={q.id as string} className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                            {q.title as string}
+                                    {questions.map((q: Question) => (
+                                        <th key={q.id} className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            {q.title}
                                         </th>
                                     ))}
                                 </tr>
@@ -72,11 +98,11 @@ export default function ResultsDashboard() {
                                         <td className="p-4 text-sm text-gray-700 whitespace-nowrap">
                                             {new Date(response.submitted_at).toLocaleString()}
                                         </td>
-                                        {questions.map((q: Record<string, unknown>) => {
-                                            const ans = (response.answers as Record<string, unknown>[]).find((a: Record<string, unknown>) => a.question_id === q.id);
+                                        {questions.map((q: Question) => {
+                                            const ans = response.answers.find((a: Answer) => a.question_id === q.id);
                                             return (
-                                                <td key={q.id as string} className="p-4 text-sm text-gray-800">
-                                                    {ans ? ans.value as string : <span className="text-gray-400 italic">Skipped</span>}
+                                                <td key={q.id} className="p-4 text-sm text-gray-800">
+                                                    {ans ? ans.value : <span className="text-gray-400 italic">Skipped</span>}
                                                 </td>
                                             );
                                         })}

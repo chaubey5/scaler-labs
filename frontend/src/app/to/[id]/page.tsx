@@ -5,9 +5,25 @@ import { fetchPublicForm, submitResponse } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
+interface Question {
+    id: string;
+    title: string;
+    description?: string;
+    type: string;
+    is_required?: boolean;
+    options?: string[];
+}
+
+interface Form {
+    id: string;
+    title: string;
+    status: string;
+    questions: Question[];
+}
+
 export default function PublicForm() {
     const params = useParams();
-    const [form, setForm] = useState<Record<string, unknown> | null>(null);
+    const [form, setForm] = useState<Form | null>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [answers, setAnswers] = useState<Record<string, string>>({});
     const [submitted, setSubmitted] = useState(false);
@@ -41,10 +57,10 @@ export default function PublicForm() {
         }
     }, [currentIndex, form]);
 
-    const questions = (form?.questions as Record<string, unknown>[]) || [];
+    const questions = form?.questions || [];
     const currentQuestion = questions[currentIndex];
     const isLast = currentIndex === questions.length - 1;
-    const currentAnswer = currentQuestion ? answers[currentQuestion.id as string] || '' : '';
+    const currentAnswer = currentQuestion ? answers[currentQuestion.id] || '' : '';
 
     const handleNext = async () => {
         if (!currentQuestion) return;
@@ -90,7 +106,7 @@ export default function PublicForm() {
     if (questions.length === 0) return <div className="h-screen flex items-center justify-center">This form has no questions.</div>;
 
     const handleAnswerChange = (val: string) => {
-        setAnswers(prev => ({ ...prev, [currentQuestion.id as string]: val }));
+        setAnswers(prev => ({ ...prev, [currentQuestion.id]: val }));
     };
 
     const progress = ((currentIndex + 1) / questions.length) * 100;
@@ -101,7 +117,7 @@ export default function PublicForm() {
                 <div className="flex-1">
                     <AnimatePresence mode="wait">
                         <motion.div
-                            key={currentQuestion.id as string}
+                            key={currentQuestion.id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
@@ -112,11 +128,11 @@ export default function PublicForm() {
                                 <span className="text-[#7c3aed] font-medium text-lg mt-1">{String(currentIndex + 1).padStart(2, '0')} →</span>
                                 <div>
                                     <h1 className="text-3xl font-semibold text-gray-900 leading-tight">
-                                        {(currentQuestion.title as string) || 'Untitled question'}
+                                        {currentQuestion.title || 'Untitled question'}
                                         {currentQuestion.is_required && <span className="text-red-500 ml-2">*</span>}
                                     </h1>
                                     {currentQuestion.description && (
-                                        <p className="text-lg text-gray-500 mt-2 font-light">{currentQuestion.description as string}</p>
+                                        <p className="text-lg text-gray-500 mt-2 font-light">{currentQuestion.description}</p>
                                     )}
                                 </div>
                             </div>
@@ -124,7 +140,7 @@ export default function PublicForm() {
                             <div className="pl-12">
                                 {currentQuestion.type === 'multiple_choice' ? (
                                     <div className="space-y-3">
-                                        {(currentQuestion.options as string[] || []).map((opt: string, i: number) => (
+                                        {(currentQuestion.options || []).map((opt: string, i: number) => (
                                             <button
                                                 key={i}
                                                 onClick={() => { handleAnswerChange(opt); setTimeout(() => handleNextRef.current?.(), 300); }}
